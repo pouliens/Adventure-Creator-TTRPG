@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RPG Scene Generator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', serif;
+            background: linear-gradient(135deg, #2c1810, #4a2c17);
+            color: #f4e6d7;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        h1 {
+            text-align: center;
+            color: #d4af37;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        .controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .explore-btn {
+            background: linear-gradient(45deg, #8b4513, #cd853f);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2em;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(139, 69, 19, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .explore-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 69, 19, 0.6);
+        }
+
+        .scene-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .scene-container > div:last-child {
+            grid-column: 1 / -1;
+        }
+
+        .scene-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .scene-section h3 {
+            color: #d4af37;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+            border-bottom: 2px solid #d4af37;
+            padding-bottom: 5px;
+        }
+
+        .scene-content {
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .tag {
+            background: rgba(212, 175, 55, 0.2);
+            color: #d4af37;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            border: 1px solid rgba(212, 175, 55, 0.4);
+        }
+
+        @media (max-width: 768px) {
+            .scene-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎲 RPG Scene Generator</h1>
+        
+        <div class="controls">
+            <button class="explore-btn" onclick="generateScene()">🗺️ Explore New Location</button>
+        </div>
+
+        <div id="scene-display" class="scene-container hidden">
+            <div class="scene-section">
+                <h3>🏞️ Location</h3>
+                <div id="location-content" class="scene-content"></div>
+                <div id="location-tags" class="tags"></div>
+            </div>
+
+            <div class="scene-section">
+                <h3>👥 Encounters</h3>
+                <div id="encounter-content" class="scene-content"></div>
+                <div id="encounter-tags" class="tags"></div>
+            </div>
+
+            <div class="scene-section">
+                <h3>🎭 Events</h3>
+                <div id="event-content" class="scene-content"></div>
+                <div id="event-tags" class="tags"></div>
+            </div>
+
+            <div class="scene-section">
+                <h3>💰 Discoveries</h3>
+                <div id="discovery-content" class="scene-content"></div>
+                <div id="discovery-tags" class="tags"></div>
+            </div>
+
+            <div class="scene-section">
+                <h3>🎯 Plot Hooks</h3>
+                <div id="plothook-content" class="scene-content"></div>
+                <div id="plothook-tags" class="tags"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Location data
+        const locations = {
+            forest: {
+                name: "Forest",
+                places: [
+                    "An ancient grove where massive oak trees form a natural cathedral",
+                    "A moonlit clearing with a babbling brook and fireflies dancing",
+                    "A dense thicket of thorns concealing a hidden path",
+                    "A fallen giant tree serving as a natural bridge over a ravine",
+                    "A circle of standing stones covered in moss and strange runes",
+                    "A woodland camp with still-warm ashes and abandoned supplies",
+                    "A misty dell where the trees seem to whisper secrets",
+                    "A hunter's blind overlooking a well-traveled animal trail"
+                ],
+                atmosphere: [
+                    "Dappled sunlight filters through the canopy above",
+                    "The air is thick with the scent of pine and earth",
+                    "Strange bird calls echo from the darkness between trees",
+                    "A gentle breeze rustles leaves overhead",
+                    "Morning mist clings to the forest floor",
+                    "The sound of crackling branches underfoot breaks the silence"
+                ],
+                tags: ["Natural", "Mysterious", "Peaceful", "Wild"]
+            },
+            mountain: {
+                name: "Mountain",
+                places: [
+                    "A windswept peak with panoramic views of the lands below",
+                    "A narrow ledge carved into the cliff face by ancient hands",
+                    "A cave mouth yawning darkly in the mountainside",
+                    "A crumbling watchtower perched on a rocky outcrop",
+                    "A natural hot spring steaming in the cold mountain air",
+                    "A precarious rope bridge spanning a deep chasm",
+                    "An avalanche-scarred slope littered with broken trees",
+                    "A hidden valley nestled between towering peaks"
+                ],
+                atmosphere: [
+                    "The air is thin and crisp, making breathing difficult",
+                    "Wind howls through the rocky peaks above",
+                    "The sound of distant rockfall echoes across the slopes",
+                    "Snow crunches underfoot despite the season",
+                    "Eagles circle high overhead, riding the thermals",
+                    "The silence is profound, broken only by your own breathing"
+                ],
+                tags: ["Treacherous", "Majestic", "Isolated", "Challenging"]
+            },
+            ruins: {
+                name: "Ancient Ruins",
+                places: [
+                    "A collapsed temple with broken columns reaching toward the sky",
+                    "An overgrown courtyard where weeds grow through cracked stone",
+                    "A partially intact tower with stairs spiraling into darkness",
+                    "A shattered statue of a forgotten deity, eyes still watching",
+                    "Underground chambers accessible through a hole in the floor",
+                    "A grand archway leading to nothing but empty air",
+                    "Crumbling walls covered in faded murals and inscriptions",
+                    "A dried fountain with coins still glinting in the basin"
+                ],
+                atmosphere: [
+                    "The weight of ages presses down on this place",
+                    "Dust motes dance in beams of sunlight",
+                    "The air tastes of old stone and forgotten dreams",
+                    "Shadows seem to move at the edge of your vision",
+                    "Every footstep echoes with the memory of the past",
+                    "Vines and moss reclaim what mortals once built"
+                ],
+                tags: ["Ancient", "Mysterious", "Haunted", "Historical"]
+            },
+            village: {
+                name: "Settlement",
+                places: [
+                    "A small farming hamlet with smoke rising from chimneys",
+                    "An abandoned village with doors hanging open in the wind",
+                    "A trading post at the crossroads of two major paths",
+                    "A riverside mill with its wheel slowly turning",
+                    "A fortified homestead surrounded by a wooden palisade",
+                    "A cluster of tents belonging to traveling merchants",
+                    "A mountain village carved into the hillside itself",
+                    "A fishing village with boats bobbing in the harbor"
+                ],
+                atmosphere: [
+                    "The smell of woodsmoke and cooking food fills the air",
+                    "Children's laughter echoes from somewhere nearby",
+                    "Laundry flaps in the breeze between buildings",
+                    "The sound of hammering rings from the smithy",
+                    "Dogs bark a warning at your approach",
+                    "An eerie silence suggests all is not well here"
+                ],
+                tags: ["Civilized", "Social", "Inhabited", "Familiar"]
+            },
+            wilderness: {
+                name: "Wilderness",
+                places: [
+                    "An endless expanse of tall grass swaying in the wind",
+                    "A dried riverbed cutting through the landscape like a scar",
+                    "A lonely hilltop crowned with a single dead tree",
+                    "A series of natural rock formations creating hidden alcoves",
+                    "A meteor crater now filled with strange, glowing water",
+                    "A battlefield where rusted weapons still litter the ground",
+                    "An ancient road, now barely visible beneath the vegetation",
+                    "A tar pit where the bones of great beasts protrude"
+                ],
+                atmosphere: [
+                    "The horizon stretches endlessly in all directions",
+                    "Strange sounds carry on the wind from far away",
+                    "The sun beats down mercilessly from above",
+                    "Night falls quickly here, bringing unexpected cold",
+                    "Every shadow could conceal danger or opportunity",
+                    "The vastness makes you feel small and vulnerable"
+                ],
+                tags: ["Desolate", "Vast", "Dangerous", "Untamed"]
+            }
+        };
+
+        // NPC data
+        const npcs = [
+            {
+                description: "A grizzled old hermit with wild hair and knowing eyes",
+                motivation: "Seeks to warn travelers of an ancient danger",
+                tags: ["Wise", "Reclusive", "Cryptic"]
+            },
+            {
+                description: "A young merchant with an expensive cloak and nervous disposition",
+                motivation: "Desperate to reach the next town before nightfall",
+                tags: ["Wealthy", "Anxious", "Talkative"]
+            },
+            {
+                description: "A battle-scarred veteran sitting by a campfire",
+                motivation: "Sharing tales of past conflicts for coin or company",
+                tags: ["Experienced", "Scarred", "Storyteller"]
+            },
+            {
+                description: "A hooded figure watching from the shadows",
+                motivation: "Observing travelers for unknown purposes",
+                tags: ["Mysterious", "Watchful", "Secretive"]
+            },
+            {
+                description: "A traveling minstrel with a lute and bright clothing",
+                motivation: "Gathering stories and songs from the road",
+                tags: ["Artistic", "Cheerful", "Curious"]
+            },
+            {
+                description: "A local guide with weathered hands and practical gear",
+                motivation: "Offering services to travelers in exchange for payment",
+                tags: ["Practical", "Knowledgeable", "Reliable"]
+            }
+        ];
+
+        // Event data
+        const events = [
+            {
+                description: "Strange lights dance in the distance, defying explanation",
+                consequence: "Following them might lead to wonder or danger",
+                tags: ["Mysterious", "Supernatural"]
+            },
+            {
+                description: "Fresh tracks cross your path, still warm to the touch",
+                consequence: "Something large passed this way recently",
+                tags: ["Tracking", "Wildlife"]
+            },
+            {
+                description: "A messenger bird lands nearby, scroll attached to its leg",
+                consequence: "The message might be important or dangerous to possess",
+                tags: ["Information", "Urgent"]
+            },
+            {
+                description: "The weather suddenly changes, bringing unexpected conditions",
+                consequence: "Shelter may be needed, or the change might reveal hidden things",
+                tags: ["Weather", "Survival"]
+            },
+            {
+                description: "Distant sounds of combat echo across the landscape",
+                consequence: "Others are fighting nearby - intervention could be needed",
+                tags: ["Combat", "Moral Choice"]
+            },
+            {
+                description: "A strange symbol has been carved into a nearby surface",
+                consequence: "It might be a warning, a clue, or a trap marker",
+                tags: ["Puzzle", "Warning"]
+            }
+        ];
+
+        // Discovery data
+        const discoveries = [
+            {
+                description: "A small cache of supplies hidden beneath a loose stone",
+                contents: "Rations, rope, and a few coins wrapped in oiled cloth",
+                tags: ["Supplies", "Hidden"]
+            },
+            {
+                description: "An old journal with pages fluttering in the wind",
+                contents: "Contains cryptic notes about local dangers and safe paths",
+                tags: ["Information", "Lore"]
+            },
+            {
+                description: "A strange mushroom growing in an unusual pattern",
+                contents: "Might be valuable to the right person, or dangerous to touch",
+                tags: ["Alchemical", "Mysterious"]
+            },
+            {
+                description: "A worn piece of equipment left behind by previous travelers",
+                contents: "Still functional but shows signs of hard use",
+                tags: ["Equipment", "Abandoned"]
+            },
+            {
+                description: "A small shrine or offering site with recent additions",
+                contents: "Coins, small trinkets, and written prayers in various languages",
+                tags: ["Religious", "Cultural"]
+            },
+            {
+                description: "Evidence of a struggle - scattered belongings and disturbed earth",
+                contents: "Clues to what happened here and potentially valuable items",
+                tags: ["Combat", "Investigation"]
+            }
+        ];
+
+        // Plot hook data
+        const plotHooks = [
+            {
+                description: "A dying messenger gasps out coordinates to a hidden treasure",
+                urgency: "Time is running out before others discover the location",
+                tags: ["Treasure", "Time Pressure", "Competition"]
+            },
+            {
+                description: "Strange disappearances in the area point to an ancient evil awakening",
+                urgency: "More people vanish each night the mystery remains unsolved",
+                tags: ["Mystery", "Supernatural", "Rescue"]
+            },
+            {
+                description: "A map fragment shows part of a route to a lost settlement",
+                urgency: "Other explorers are also searching for the remaining pieces",
+                tags: ["Exploration", "Competition", "Discovery"]
+            },
+            {
+                description: "Local wildlife has been acting strangely, fleeing from something",
+                urgency: "Whatever is causing this behavior is moving closer to inhabited areas",
+                tags: ["Investigation", "Wildlife", "Danger"]
+            },
+            {
+                description: "A coded message intercepted from enemy agents mentions this location",
+                urgency: "Their plans are already in motion and must be stopped",
+                tags: ["Espionage", "Sabotage", "Urgent"]
+            },
+            {
+                description: "An ancient prophecy speaks of a chosen one who will arrive at this place",
+                urgency: "Dark forces are also aware of the prophecy and seek to corrupt it",
+                tags: ["Prophecy", "Destiny", "Good vs Evil"]
+            },
+            {
+                description: "A merchant's caravan is overdue and was last seen heading in this direction",
+                urgency: "Supplies in the next town are running low without the expected delivery",
+                tags: ["Rescue", "Commerce", "Investigation"]
+            },
+            {
+                description: "Magical experiments have gone wrong, creating dangerous anomalies",
+                urgency: "The effects are spreading and could affect a much larger area",
+                tags: ["Magic", "Containment", "Urgent"]
+            },
+            {
+                description: "A plea for help was found in a bottle, giving vague directions to this area",
+                urgency: "The message is old, but hope remains that someone still needs rescue",
+                tags: ["Rescue", "Mystery", "Hope"]
+            },
+            {
+                description: "Political intrigue requires a secret meeting at a neutral location",
+                urgency: "War or peace may depend on the outcome of these negotiations",
+                tags: ["Politics", "Diplomacy", "Consequences"]
+            }
+        ];
+
+        function randomChoice(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+
+        function generateLocation() {
+            const locationType = randomChoice(Object.keys(locations));
+            const location = locations[locationType];
+            const place = randomChoice(location.places);
+            const atmosphere = randomChoice(location.atmosphere);
+            
+            return {
+                description: `${place}. ${atmosphere}`,
+                tags: location.tags
+            };
+        }
+
+        function generateEncounter() {
+            const hasNPC = Math.random() > 0.3;
+            if (hasNPC) {
+                const npc = randomChoice(npcs);
+                return {
+                    description: `${npc.description}. ${npc.motivation}`,
+                    tags: npc.tags
+                };
+            } else {
+                return {
+                    description: "The area appears deserted, but signs of recent passage are evident",
+                    tags: ["Empty", "Peaceful"]
+                };
+            }
+        }
+
+        function generateEvent() {
+            const hasEvent = Math.random() > 0.4;
+            if (hasEvent) {
+                const event = randomChoice(events);
+                return {
+                    description: `${event.description}. ${event.consequence}`,
+                    tags: event.tags
+                };
+            } else {
+                return {
+                    description: "Nothing unusual occurs as you survey the area",
+                    tags: ["Calm", "Uneventful"]
+                };
+            }
+        }
+
+        function generateDiscovery() {
+            const hasDiscovery = Math.random() > 0.3;
+            if (hasDiscovery) {
+                const discovery = randomChoice(discoveries);
+                return {
+                    description: `${discovery.description}. ${discovery.contents}`,
+                    tags: discovery.tags
+                };
+            } else {
+                return {
+                    description: "A careful search reveals nothing of immediate interest",
+                    tags: ["Empty", "Searched"]
+                };
+            }
+        }
+
+        function generatePlotHook() {
+            const hasPlotHook = Math.random() > 0.4;
+            if (hasPlotHook) {
+                const plotHook = randomChoice(plotHooks);
+                return {
+                    description: `${plotHook.description}. ${plotHook.urgency}`,
+                    tags: plotHook.tags
+                };
+            } else {
+                return {
+                    description: "This seems like a peaceful location with no pressing concerns",
+                    tags: ["Peaceful", "No Urgency"]
+                };
+            }
+        }
+
+        function createTags(tags) {
+            return tags.map(tag => `<span class="tag">${tag}</span>`).join('');
+        }
+
+        function generateScene() {
+            document.getElementById('scene-display').classList.remove('hidden');
+            
+            const location = generateLocation();
+            const encounter = generateEncounter();
+            const event = generateEvent();
+            const discovery = generateDiscovery();
+            const plotHook = generatePlotHook();
+            
+            document.getElementById('location-content').innerHTML = location.description;
+            document.getElementById('location-tags').innerHTML = createTags(location.tags);
+            
+            document.getElementById('encounter-content').innerHTML = encounter.description;
+            document.getElementById('encounter-tags').innerHTML = createTags(encounter.tags);
+            
+            document.getElementById('event-content').innerHTML = event.description;
+            document.getElementById('event-tags').innerHTML = createTags(event.tags);
+            
+            document.getElementById('discovery-content').innerHTML = discovery.description;
+            document.getElementById('discovery-tags').innerHTML = createTags(discovery.tags);
+
+            document.getElementById('plothook-content').innerHTML = plotHook.description;
+            document.getElementById('plothook-tags').innerHTML = createTags(plotHook.tags);
+        }
+    </script>
+</body>
+</html>
