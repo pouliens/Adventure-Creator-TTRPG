@@ -357,19 +357,11 @@
         }
 
         function generateEvent() {
-            const hasEvent = Math.random() > 0.4;
-            if (hasEvent) {
-                const event = randomChoice(events);
-                return {
-                    description: `${event.description}. ${event.consequence}`,
-                    tags: event.tags
-                };
-            } else {
-                return {
-                    description: "Nothing unusual occurs as you survey the area",
-                    tags: ["Calm", "Uneventful"]
-                };
-            }
+            const event = randomChoice(events);
+            return {
+                description: `${event.description}. ${event.consequence}`,
+                tags: event.tags
+            };
         }
 
         function generateDiscovery() {
@@ -408,31 +400,26 @@
             return tags.map(tag => `<span class="tag">${tag}</span>`).join('');
         }
 
-        function generateScene() {
+        const typeMap = {
+            'location': { title: '🏞️ Location', generator: generateLocation },
+            'encounter': { title: '👥 Encounter', generator: generateEncounter },
+            'event': { title: '🎭 Event', generator: generateEvent },
+            'discovery': { title: '💰 Discovery', generator: generateDiscovery },
+            'plothook': { title: '🎯 Plot Hook', generator: generatePlotHook },
+            'enemy': { title: '👹 Enemy', generator: generateEnemy }
+        };
+
+        function generateAndDisplay(type) {
+            const typeInfo = typeMap[type];
+            if (!typeInfo) {
+                console.error("Unknown generation type: " + type);
+                return;
+            }
+
+            const result = typeInfo.generator();
+            
             document.getElementById('scene-display').classList.remove('hidden');
-            
-            const location = generateLocation();
-            const encounter = generateEncounter();
-            const event = generateEvent();
-            const discovery = generateDiscovery();
-            const plotHook = generatePlotHook();
-            const enemy = generateEnemy();
-            
-            document.getElementById('location-content').innerHTML = location.description;
-            document.getElementById('location-tags').innerHTML = createTags(location.tags);
-            
-            document.getElementById('encounter-content').innerHTML = encounter.description;
-            document.getElementById('encounter-tags').innerHTML = createTags(encounter.tags);
-            
-            document.getElementById('event-content').innerHTML = event.description;
-            document.getElementById('event-tags').innerHTML = createTags(event.tags);
-            
-            document.getElementById('discovery-content').innerHTML = discovery.description;
-            document.getElementById('discovery-tags').innerHTML = createTags(discovery.tags);
-
-            document.getElementById('plothook-content').innerHTML = plotHook.description;
-            document.getElementById('plothook-tags').innerHTML = createTags(plotHook.tags);
-
-            document.getElementById('enemy-content').innerHTML = enemy.description;
-            document.getElementById('enemy-tags').innerHTML = createTags(enemy.tags);
+            document.getElementById('section-title').textContent = typeInfo.title;
+            document.getElementById('section-content').innerHTML = result.description;
+            document.getElementById('section-tags').innerHTML = createTags(result.tags);
         }

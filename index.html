@@ -11,44 +11,19 @@
         <h1>🎲 RPG Scene Generator</h1>
         
         <div class="controls">
-            <button class="explore-btn" onclick="generateScene()">🗺️ Explore New Location</button>
+            <button class="explore-btn" onclick="generateAndDisplay('location')">🗺️ Location</button>
+            <button class="explore-btn" onclick="generateAndDisplay('encounter')">👥 Encounter</button>
+            <button class="explore-btn" onclick="generateAndDisplay('event')">🎭 Event</button>
+            <button class="explore-btn" onclick="generateAndDisplay('discovery')">💰 Discovery</button>
+            <button class="explore-btn" onclick="generateAndDisplay('plothook')">🎯 Plot Hook</button>
+            <button class="explore-btn" onclick="generateAndDisplay('enemy')">👹 Enemy</button>
         </div>
 
         <div id="scene-display" class="scene-container hidden">
-            <div class="scene-section">
-                <h3>🏞️ Location</h3>
-                <div id="location-content" class="scene-content"></div>
-                <div id="location-tags" class="tags"></div>
-            </div>
-
-            <div class="scene-section">
-                <h3>👥 Encounters</h3>
-                <div id="encounter-content" class="scene-content"></div>
-                <div id="encounter-tags" class="tags"></div>
-            </div>
-
-            <div class="scene-section">
-                <h3>🎭 Events</h3>
-                <div id="event-content" class="scene-content"></div>
-                <div id="event-tags" class="tags"></div>
-            </div>
-
-            <div class="scene-section">
-                <h3>💰 Discoveries</h3>
-                <div id="discovery-content" class="scene-content"></div>
-                <div id="discovery-tags" class="tags"></div>
-            </div>
-
-            <div class="scene-section">
-                <h3>🎯 Plot Hooks</h3>
-                <div id="plothook-content" class="scene-content"></div>
-                <div id="plothook-tags" class="tags"></div>
-            </div>
-
-            <div class="scene-section">
-                <h3>👹 Enemies</h3>
-                <div id="enemy-content" class="scene-content"></div>
-                <div id="enemy-tags" class="tags"></div>
+            <div id="current-section" class="scene-section">
+                <h3 id="section-title"></h3>
+                <div id="section-content" class="scene-content"></div>
+                <div id="section-tags" class="tags"></div>
             </div>
         </div>
     </div>
