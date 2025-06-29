@@ -11,6 +11,10 @@ A web-based tool for tabletop RPG Game Masters to generate immersive scenes and 
 - **Plot Hooks**: Generates compelling story elements to drive adventures forward
 - **Responsive Design**: Works on desktop and mobile devices
 
+## Live Demo
+
+The page is available here: https://pouliens.github.io/Adventure-Creator-TTRPG/
+
 ## How to Use
 
 1. Open `index.html` in your web browser
