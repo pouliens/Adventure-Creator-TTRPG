@@ -154,6 +154,12 @@
                 <div id="plothook-content" class="scene-content"></div>
                 <div id="plothook-tags" class="tags"></div>
             </div>
+
+            <div class="scene-section">
+                <h3>👹 Enemies</h3>
+                <div id="enemy-content" class="scene-content"></div>
+                <div id="enemy-tags" class="tags"></div>
+            </div>
         </div>
     </div>
 
@@ -428,8 +434,64 @@
             }
         ];
 
+        // Enemy data
+        const enemies = [
+            {
+                name: "Goblin Scout",
+                description: "A small, green-skinned creature with a rusty dagger and a mischievous glint in its eye.",
+                challenge: "Low",
+                tags: ["Goblin", "Melee", "Weak"]
+            },
+            {
+                name: "Dire Wolf",
+                description: "A massive wolf with glowing red eyes and fur as black as night, known for its ferocity.",
+                challenge: "Medium",
+                tags: ["Beast", "Melee", "Fast"]
+            },
+            {
+                name: "Skeleton Warrior",
+                description: "The animated bones of a fallen warrior, clad in ancient, rusted armor.",
+                challenge: "Medium",
+                tags: ["Undead", "Melee", "Resilient"]
+            },
+            {
+                name: "Giant Spider",
+                description: "A monstrous arachnid, its venomous fangs dripping with poison, capable of weaving sticky webs.",
+                challenge: "Medium",
+                tags: ["Beast", "Poison", "Web"]
+            },
+            {
+                name: "Bandit Leader",
+                description: "A cunning and ruthless human, leading a small group of brigands, armed with a well-maintained sword.",
+                challenge: "High",
+                tags: ["Humanoid", "Melee", "Tactical"]
+            },
+            {
+                name: "Shadow Lurker",
+                description: "A creature of pure shadow, barely visible in dim light, striking from unexpected angles.",
+                challenge: "High",
+                tags: ["Aberration", "Stealth", "Ethereal"]
+            }
+        ];
+
         function randomChoice(array) {
             return array[Math.floor(Math.random() * array.length)];
+        }
+
+        function generateEnemy() {
+            const hasEnemy = Math.random() > 0.5; // 50% chance of an enemy appearing
+            if (hasEnemy) {
+                const enemy = randomChoice(enemies);
+                return {
+                    description: `${enemy.name}: ${enemy.description} (Challenge: ${enemy.challenge})`,
+                    tags: enemy.tags
+                };
+            } else {
+                return {
+                    description: "No immediate threats are apparent in this area.",
+                    tags: ["Safe", "Clear"]
+                };
+            }
         }
 
         function generateLocation() {
@@ -520,6 +582,7 @@
             const event = generateEvent();
             const discovery = generateDiscovery();
             const plotHook = generatePlotHook();
+            const enemy = generateEnemy();
             
             document.getElementById('location-content').innerHTML = location.description;
             document.getElementById('location-tags').innerHTML = createTags(location.tags);
@@ -535,6 +598,9 @@
 
             document.getElementById('plothook-content').innerHTML = plotHook.description;
             document.getElementById('plothook-tags').innerHTML = createTags(plotHook.tags);
+
+            document.getElementById('enemy-content').innerHTML = enemy.description;
+            document.getElementById('enemy-tags').innerHTML = createTags(enemy.tags);
         }
     </script>
 </body>
